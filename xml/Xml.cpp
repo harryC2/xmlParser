@@ -1,8 +1,110 @@
 #include"Xml.h"
 #include<sstream>
-
+#include "Parser.h"
 
 using namespace yazi::xml;
+
+Value::Value()
+{
+
+}
+Value::Value(bool value)
+{
+    *this = value;
+}
+
+Value::Value(int value)
+{
+    *this = value;
+}
+
+Value::Value(double value)
+{
+    *this = value;
+}
+Value::Value(const char * value) : m_value(value)
+{
+}
+
+Value::Value(const string & value) : m_value(value)
+{
+}
+
+Value::~Value()
+{
+}
+Value & Value::operator = (bool value)
+{
+    m_value = value ? "true" : "false";
+    return *this;
+}
+
+Value & Value::operator = (int value)
+{
+    stringstream ss;
+    ss << value;
+    m_value = ss.str();
+    return *this;
+}
+
+Value & Value::operator = (double value)
+{
+    stringstream ss;
+    ss << value;
+    m_value = ss.str();
+    return *this;
+}
+
+Value & Value::operator = (const char * value)
+{
+    m_value = value;
+    return *this;
+}
+
+Value & Value::operator = (const string & value)
+{
+    m_value = value;
+    return *this;
+}
+
+Value & Value::operator = (const Value & value)
+{
+    m_value = value.m_value;
+    return *this;
+}
+bool Value::operator == (const Value & other)
+{
+    return m_value == other.m_value;
+}
+
+bool Value::operator != (const Value & other)
+{
+    return !(m_value == other.m_value);
+}
+
+Value::operator bool()
+{
+    if (m_value == "true")
+        return true;
+    else if (m_value == "false")
+        return false;
+    return false;
+}
+
+Value::operator int()
+{
+    return std::atoi(m_value.c_str());
+}
+
+Value::operator double()
+{
+    return std::atof(m_value.c_str());
+}
+
+Value::operator string()
+{
+    return m_value;
+}
 
 
 Xml::Xml(/* args */)
@@ -32,6 +134,13 @@ Xml::Xml(const Xml & other)
     m_child = other.m_child;
 }
 
+
+Xml& Xml::parse(const string& strName)
+{
+    Parser parser;
+    parser.loadFile(strName);
+    *this = parser.parse();
+}
 
 string Xml::getName() const
 {
@@ -67,7 +176,7 @@ void Xml::setText(const string &test)
     m_text = new string(test);
 }
 
-string Xml::getAttr(const string& key)
+Value Xml::getAttr(const string& key)
 {
     if(m_attrs == nullptr)
     {
@@ -77,11 +186,11 @@ string Xml::getAttr(const string& key)
     //std::map<string,string>* m_attrs{nullptr}; // 属性
 }
 
-void Xml::setAttr(const string& key,const string & val)
+void Xml::setAttr(const string& key,const Value & val)
 {
     if(m_attrs == nullptr)
     {
-        m_attrs = new std::map<string,string>();
+        m_attrs = new std::map<string,Value>();
     }
    auto resultPair = m_attrs->emplace(key,val); // 避免了临时创建对象，但是如果不存在的话，插入不进去
    if (!resultPair.second)
@@ -102,12 +211,12 @@ string Xml::toString()const
     ss << *m_name;
     if(m_attrs != nullptr)
     {
-        for(const auto& item : *m_attrs)
+        for(auto& item : *m_attrs)
         {
             ss<< " ";
             ss<< item.first ;
             ss<< " =\"";
-            ss<< item.second;
+            ss<< (string)item.second;
             ss<< "\"";
         }
     }

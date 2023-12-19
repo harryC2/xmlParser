@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- book标签用于描述一本的各个属性-->
+<book>
+	<name>新的世界</name>
+	<year>3</year>
+	<price >56.6</price>
+    <name id = "213">新的世界ewrwerwer</name>
+	<year>3</year>
+	<price >56.6</price>
+    <name id = "456">新的世界ewrwer</name>
+	<year>3</year>
+	<price>56.6</price>
+       <name id = "456">新的世界ewrwer</name>
+          <name id = "456">新的世界ewrwer</name>
+             <name id = "456">新的世界ewrwer</name>
+</book>
